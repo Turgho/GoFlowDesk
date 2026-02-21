@@ -13,5 +13,7 @@ WORKDIR /app
 COPY --from=build /app/goflowdesk .
 COPY .env .
 
+RUN apk add --no-cache curl
+
 EXPOSE 8080
 CMD ["./goflowdesk"]
