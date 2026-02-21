@@ -14,7 +14,8 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
-		v1.GET("/health-check/database", h.HealthCheckDatabase)
+		v1.GET("/live", h.Liveness)
+		v1.GET("/ready", h.Readiness)
 	}
 
 	return r
