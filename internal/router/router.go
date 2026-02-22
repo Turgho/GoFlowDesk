@@ -2,21 +2,22 @@ package router
 
 import (
 	"database/sql"
+	"log/slog"
 
 	"github.com/Turgho/GoFlowDesk/internal/handler"
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(db *sql.DB) *gin.Engine {
-	r := gin.Default()
+func SetupRouter(db *sql.DB, log *slog.Logger) *gin.Engine {
+	router := gin.Default()
 
-	h := handler.NewHealthHandler(db)
+	healthHandler := handler.NewHealthHandler(db, log)
 
-	v1 := r.Group("/api/v1")
+	v1 := router.Group("/api/v1")
 	{
-		v1.GET("/live", h.Liveness)
-		v1.GET("/ready", h.Readiness)
+		v1.GET("/live", healthHandler.Liveness)
+		v1.GET("/ready", healthHandler.Readiness)
 	}
 
-	return r
+	return router
 }
