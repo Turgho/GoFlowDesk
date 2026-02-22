@@ -1,4 +1,4 @@
-package models
+package ticket
 
 import "time"
 

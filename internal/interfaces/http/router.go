@@ -1,17 +1,16 @@
-package router
+package http
 
 import (
 	"database/sql"
 	"log/slog"
 
-	"github.com/Turgho/GoFlowDesk/internal/handler"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter(db *sql.DB, log *slog.Logger) *gin.Engine {
 	router := gin.Default()
 
-	healthHandler := handler.NewHealthHandler(db, log)
+	healthHandler := NewHealthHandler(db, log)
 
 	v1 := router.Group("/api/v1")
 	{

@@ -1,4 +1,4 @@
-package models
+package ticket
 
 const (
 	StatusOpen     = "open"

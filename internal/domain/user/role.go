@@ -1,4 +1,4 @@
-package models
+package user
 
 const (
 	RoleAdmin = "admin"

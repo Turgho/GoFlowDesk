@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/Turgho/GoFlowDesk/internal/database"
-	"github.com/Turgho/GoFlowDesk/internal/logger"
-	"github.com/Turgho/GoFlowDesk/internal/router"
+	"github.com/Turgho/GoFlowDesk/internal/infrastructure/database"
+	"github.com/Turgho/GoFlowDesk/internal/infrastructure/logger"
+	"github.com/Turgho/GoFlowDesk/internal/interfaces/http"
 	"github.com/joho/godotenv"
 )
 
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	// Init router with database and logger
-	r := router.SetupRouter(dbConnection, log)
+	r := http.SetupRouter(dbConnection, log)
 
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {

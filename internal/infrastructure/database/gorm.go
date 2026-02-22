@@ -3,7 +3,8 @@ package database
 import (
 	"database/sql"
 
-	"github.com/Turgho/GoFlowDesk/internal/models"
+	"github.com/Turgho/GoFlowDesk/internal/domain/ticket"
+	"github.com/Turgho/GoFlowDesk/internal/domain/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -21,9 +22,9 @@ func SetupGorm(db *sql.DB) *gorm.DB {
 
 func AutoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
-		&models.User{},
-		&models.Ticket{},
-		&models.TicketMessages{},
+		&user.User{},
+		&ticket.Ticket{},
+		&ticket.TicketMessages{},
 	)
 	if err != nil {
 		return err
