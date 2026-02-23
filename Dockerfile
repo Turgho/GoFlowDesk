@@ -6,7 +6,7 @@ RUN go mod download
 
 COPY . .
 # Build the Go application with CGO disabled for a statically linked binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o goflowdesk ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -o goflowdesk ./cmd/goflowdesk
 
 FROM alpine:3.23.3
 WORKDIR /app
