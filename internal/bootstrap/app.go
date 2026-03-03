@@ -1,20 +1,24 @@
 package bootstrap
 
 import (
-	"context"
-	"log/slog"
-	"os"
+	httpadapter "github.com/Turgho/GoFlowDesk/internal/adapters/http"
+	"github.com/Turgho/GoFlowDesk/internal/infrastructure"
 )
 
-func Run() {
-	ctx := context.Background()
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+type App struct {
+	server *infrastructure.Server
+}
 
-	db, err := InitConfig(ctx, logger)
-	if err != nil {
-		logger.Error("Failed to initialize application", "error", err)
-		os.Exit(1)
-		return
+func NewApp() *App {
+	router := httpadapter.NewRouter()
+
+	server := infrastructure.NewServer(":8080", router)
+
+	return &App{
+		server: server,
 	}
-	defer db.Close()
+}
+
+func (a *App) Run() error {
+	return a.server.Start()
 }
