@@ -1,8 +1,10 @@
-package httpadapter
+package health
 
 import (
 	"net/http"
 	"time"
+
+	"github.com/Turgho/GoFlowDesk/internal/handler/render"
 )
 
 type HealthHandler interface {
@@ -23,5 +25,5 @@ func (h *healthHandler) Check(w http.ResponseWriter, r *http.Request) {
 		"time":    time.Now().UTC(),
 	}
 
-	_ = WriteJSON(w, http.StatusOK, response, nil)
+	_ = render.WriteJSON(w, http.StatusOK, response, nil)
 }

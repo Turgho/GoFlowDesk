@@ -2,14 +2,34 @@ package database
 
 import (
 	"context"
-	"log/slog"
+	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
+type PostgresDB struct {
+	Pool *pgxpool.Pool
+}
+
+func NewPostgresDB(ctx context.Context, databaseURL string, log *zap.Logger) (*PostgresDB, error) {
+	if log == nil {
+		return nil, errors.New("logger não inicializado")
+	}
+
+	pool, err := databaseConnection(ctx, databaseURL, log)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PostgresDB{
+		Pool: pool,
+	}, nil
+}
+
 // conexões e migrações
-func DatabaseConnection(ctx context.Context, databaseURL string, logger *slog.Logger) (*pgxpool.Pool, error) {
-	logger.With("Database", "Connection").Info("Connecting to database")
+func databaseConnection(ctx context.Context, databaseURL string, log *zap.Logger) (*pgxpool.Pool, error) {
+	log.Info("Tentando conectar ao banco de dados")
 
 	cfg, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
@@ -24,17 +44,16 @@ func DatabaseConnection(ctx context.Context, databaseURL string, logger *slog.Lo
 
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
-		logger.Error("Failed to connect to database", "error", err)
+		log.Error("Erro ao conectar ao banco de dados", zap.String("error:", err.Error()))
 		return nil, err
 	}
 
 	if err := pool.Ping(ctx); err != nil {
-		logger.Error("Failed to ping database", "error", err)
+		log.Error("Falha ao testar conexão com o banco de dados", zap.String("error:", err.Error()))
 		pool.Close()
 		return nil, err
 	}
 
-	logger.Info("Database connection established successfully")
-
+	log.Info("Conexão com o banco de dados estabelecida com sucesso")
 	return pool, nil
 }

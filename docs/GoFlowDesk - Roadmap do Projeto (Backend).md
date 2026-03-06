@@ -5,16 +5,98 @@ GoFlowDesk com foco em **Clean Architecture** e **Domain‑Driven Design (DDD)**
 A ideia é manter uma base sólida na fase inicial e, a partir dela, evoluir de
 forma incremental para mensageria, workers, observabilidade e implantação.
 
-> 🧱 A estrutura de pastas sugerida segue as camadas internas de DDD:
+> 🧱 A estrutura de pastas sugerida segue as camadas internas de DDD e pode
+>     evoluir conforme novas responsabilidades surgem (cache, mensageria,
+>     workers, observabilidade etc.). Um esqueleto inicial mínimo fica assim
+>     mas deve permitir crescer de forma ordenada:
 >
 > ```text
-> cmd/api               – ponto de entrada
-> internal/             – código da aplicação
->   ├─ domain/          – entidades, valores, erros, interfaces (core)
->   ├─ application/     – casos de uso, DTOs, serviços (use cases)
->   ├─ interfaces/      – adaptadores (HTTP, CLI, etc.)
->   └─ infrastructure/  – implementações (DB, cache, messaging)
-> pkg/                 – bibliotecas utilitárias reutilizáveis
+> .
+> ├── cmd/
+> │   ├── api/
+> │   │   └── main.go
+> │   ├── worker-sla/
+> │   │   └── main.go
+> │   ├── worker-notifications/
+> │   │   └── main.go
+> │   └── ...
+> │
+> ├── internal/
+> │   ├── bootstrap/
+> │   │   ├── app.go
+> │   │   └── container.go
+> │   │
+> │   ├── domain/
+> │   │   ├── user.go
+> │   │   ├── ticket.go
+> │   │   ├── ticket_status.go
+> │   │   ├── sla_rule.go
+> │   │   ├── log_entry.go
+> │   │   ├── errors.go
+> │   │   └── event/
+> │   │       ├── ticket_created.go
+> │   │       └── sla_breached.go
+> │   │
+> │   ├── application/
+> │   │   ├── ports/
+> │   │   │   ├── user_repository.go
+> │   │   │   └── ticket_repository.go
+> │   │   ├── security/
+> │   │   │   └── password_hasher.go
+> │   │   ├── user/
+> │   │   │   ├── create.go
+> │   │   │   ├── get.go
+> │   │   │   ├── list.go
+> │   │   │   ├── authenticate.go
+> │   │   │   ├── update.go
+> │   │   │   └── delete.go
+> │   │   └── ticket/
+> │   │       ├── create.go
+> │   │       ├── update_status.go
+> │   │       └── list.go
+> │   │
+> │   ├── adapters/
+> │   │   ├── http/
+> │   │   │   ├── handler/
+> │   │   │   │   ├── user_handler.go
+> │   │   │   │   └── ticket_handler.go
+> │   │   │   ├── middleware/
+> │   │   │   │   ├── auth.go
+> │   │   │   │   └── ratelimit.go
+> │   │   │   ├── dto/
+> │   │   │   │   └── user_dto.go
+> │   │   │   ├── routes.go
+> │   │   │   └── json.go
+> │   │   ├── postgres/
+> │   │   │   ├── user_repository.go
+> │   │   │   ├── ticket_repository.go
+> │   │   │   └── queries.sql
+> │   │   ├── redis/
+> │   │   │   └── cache.go
+> │   │   └── rabbitmq/
+> │   │       └── producer.go
+> │   │
+> │   └── infrastructure/
+> │       ├── database/
+> │       │   └── postgres.go
+> │       ├── messaging/
+> │       │   └── rabbitmq.go
+> │       ├── logging/
+> │       │   └── logger.go
+> │       ├── metrics/
+> │       │   └── prometheus.go
+> │       └── server.go
+> │
+> ├── pkg/
+> │   └── config/
+> │       └── config.go
+> ├── migrations/
+> ├── scripts/
+> ├── docs/
+> ├── docker-compose.yml
+> ├── Dockerfile
+> ├── go.mod
+> └── README.md
 > ```
 
 ---
