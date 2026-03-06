@@ -4,9 +4,14 @@ import (
 	"context"
 	"os"
 
-	"github.com/Turgho/GoFlowDesk/internal/handler"
 	"github.com/Turgho/GoFlowDesk/internal/infrastructure"
 	"github.com/Turgho/GoFlowDesk/internal/infrastructure/database"
+
+	userHandler "github.com/Turgho/GoFlowDesk/internal/handler/user"
+	repoUser "github.com/Turgho/GoFlowDesk/internal/repository/user"
+	routerpkg "github.com/Turgho/GoFlowDesk/internal/router"
+	securitypkg "github.com/Turgho/GoFlowDesk/internal/service/security"
+	serviceUser "github.com/Turgho/GoFlowDesk/internal/service/user"
 	"go.uber.org/zap"
 )
 
@@ -30,7 +35,20 @@ func NewApp(log *zap.Logger) *App {
 	}
 
 	// Router
-	router := handler.NewRouter()
+	router := routerpkg.NewRouter()
+
+	// Repositories
+	userRepo := repoUser.NewUserRepository(postgresDB.Pool)
+
+	// Services
+	hasher := securitypkg.NewArgon2Hasher()
+	userSvc := serviceUser.NewService(userRepo, hasher)
+
+	// Handlers
+	uh := userHandler.NewUserHandler(userSvc)
+
+	// Routes
+	routerpkg.RegisterRoutes(router, uh)
 
 	// Server
 	server := infrastructure.NewServer(":8080", router, log)
