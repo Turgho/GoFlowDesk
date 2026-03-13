@@ -3,7 +3,7 @@ package user
 import (
 	"net/http"
 
-	domainUser "github.com/Turgho/GoFlowDesk/internal/domain/user"
+	handlerpkg "github.com/Turgho/GoFlowDesk/internal/handler"
 	"github.com/Turgho/GoFlowDesk/internal/handler/render"
 	usersvc "github.com/Turgho/GoFlowDesk/internal/service/user"
 )
@@ -27,28 +27,30 @@ type createUserRequest struct {
 
 // Create handles user creation.
 func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
+	// Leer e validar o payload JSON
 	req, err := render.ReadJSON[createUserRequest](w, r)
+
 	if err != nil {
-		render.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()}, nil)
+		// payload inválido ou leitura falhou
+		(&handlerpkg.APIResponse{
+			Message: "bad request",
+			Errors:  []string{err.Error()},
+		}).Send(w, http.StatusBadRequest)
 		return
 	}
 
 	u, err := h.userSvc.CreateUser(r.Context(), req.Name, req.Email, req.Password)
 	if err != nil {
-		// map domain errors to HTTP codes
-		switch err {
-		case domainUser.ErrEmailAlreadyExists:
-			render.WriteJSON(w, http.StatusConflict, map[string]string{"error": err.Error()}, nil)
-		case domainUser.ErrEmptyName, domainUser.ErrEmptyEmail, domainUser.ErrEmptyPassword, domainUser.ErrInvalidUserRole:
-			render.WriteJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()}, nil)
-		default:
-			render.WriteJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()}, nil)
-		}
+		// mapeamento de erros de domínio para respostas HTTP
+		HandleError(w, err)
 		return
 	}
 
 	// avoid returning password hash
 	u.PasswordHash = ""
 
-	render.WriteJSON(w, http.StatusCreated, u, nil)
+	(&handlerpkg.APIResponse{
+		Data:    u,
+		Message: "created",
+	}).Send(w, http.StatusCreated)
 }

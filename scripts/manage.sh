@@ -39,10 +39,6 @@ Comandos:
   ├── force <version> | Força versão
   ├── version         | Mostra versão atual
   └── create <name>   | Cria nova migration
-
-  seed                | Executa o seed para popular o banco de dados
-
-  test                | Executa testes unitários
 EOF
 }
 
@@ -54,26 +50,6 @@ migrate_down()    { migrate -path "$MIGRATIONS_PATH" -database "$DB_URL" down 1;
 migrate_force()   { migrate -path "$MIGRATIONS_PATH" -database "$DB_URL" force "${1:?Você precisa informar a versão}"; }
 migrate_version() { migrate -path "$MIGRATIONS_PATH" -database "$DB_URL" version; }
 migrate_create()  { migrate create -ext sql -dir "$MIGRATIONS_PATH" -seq "${1:?Você precisa informar o nome da migration}"; }
-
-# ---------------------------------------------
-# Função de seed
-# ---------------------------------------------
-run_seed() {
-  echo "Executando seed..."
-  
-  # Se estiver rodando via docker-compose
-  docker compose run --rm seed
-}
-
-# ---------------------------------------------
-# Função de testes unitários
-# ---------------------------------------------
-run_tests() {
-  echo "Executando testes unitários..."
-
-  # Docker compose com volume apontando para raiz do projeto, para enxergar go.mod
-  docker compose run --rm test-run
-}
 
 # ---------------------------------------------
 # Dispatcher de comandos
@@ -90,7 +66,5 @@ case "$command" in
       *) show_help; exit 1 ;;
     esac
     ;;
-  seed) run_seed ;;
-  test) run_tests ;;
   *) show_help; exit 1 ;;
 esac

@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/httprate v0.15.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jackc/pgx/v5 v5.8.0
+	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.48.0
 )

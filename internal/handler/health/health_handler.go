@@ -2,9 +2,8 @@ package health
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/Turgho/GoFlowDesk/internal/handler/render"
+	handlerpkg "github.com/Turgho/GoFlowDesk/internal/handler"
 )
 
 type HealthHandler interface {
@@ -18,12 +17,13 @@ func NewHealthHandler() HealthHandler {
 }
 
 func (h *healthHandler) Check(w http.ResponseWriter, r *http.Request) {
-	response := map[string]any{
-		"status":  "ok",
-		"service": "goflowdesk-api",
-		"version": "1.0.0",
-		"time":    time.Now().UTC(),
+	response := handlerpkg.APIResponse{
+		Data: map[string]any{
+			"status":  "ok",
+			"service": "goflowdesk-api",
+			"version": "1.0.0",
+		},
 	}
 
-	_ = render.WriteJSON(w, http.StatusOK, response, nil)
+	_ = response.Send(w, http.StatusOK)
 }

@@ -10,13 +10,19 @@ import (
 	repo "github.com/Turgho/GoFlowDesk/internal/repository/user"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 func setupTestRepo(t *testing.T) (*repo.UserRepository, context.Context, func()) {
+	if err := godotenv.Load("../../../.env"); err != nil {
+		t.Log(".env não encontrado, usando variáveis do ambiente")
+	}
+
 	ctx := context.Background()
-	databaseURL := os.Getenv("DATABASE_URL_TEST")
+
+	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		t.Fatal("DATABASE_URL_TEST não definido")
+		t.Fatal("DATABASE_URL não definido")
 	}
 	pool, err := pgxpool.New(ctx, databaseURL)
 	if err != nil {
@@ -52,10 +58,12 @@ func TestUserRepository_CreateAndFind(t *testing.T) {
 		UpdatedAt:    time.Now(),
 	}
 
+	// Testa criação
 	if err := repo.Create(ctx, user); err != nil {
 		t.Fatal("Erro ao criar usuário:", err)
 	}
 
+	// Buscar por ID
 	found, err := repo.FindByID(ctx, user.ID)
 	if err != nil {
 		t.Fatal("Erro ao buscar usuário por ID:", err)
@@ -64,6 +72,7 @@ func TestUserRepository_CreateAndFind(t *testing.T) {
 		t.Fatalf("Esperado %s, achado %s", user.Email, found.Email)
 	}
 
+	// Buscar por email
 	found2, err := repo.FindByEmail(ctx, user.Email)
 	if err != nil {
 		t.Fatal("Erro ao buscar usuário por email:", err)
@@ -72,6 +81,7 @@ func TestUserRepository_CreateAndFind(t *testing.T) {
 		t.Fatalf("Esperado ID %s, achado %s", user.ID, found2.ID)
 	}
 
+	// Listar usuários
 	users, err := repo.List(ctx, 10, 0)
 	if err != nil {
 		t.Fatal("Erro ao listar usuários:", err)

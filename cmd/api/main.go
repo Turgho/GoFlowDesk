@@ -5,10 +5,16 @@ import (
 
 	"github.com/Turgho/GoFlowDesk/internal/app"
 	"github.com/Turgho/GoFlowDesk/internal/infrastructure/logging"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	debug := os.Getenv("ENVIRONMENT") != "production"
 
 	// Cria logger primeiro

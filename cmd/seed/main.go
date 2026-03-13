@@ -11,9 +11,15 @@ import (
 	"github.com/Turgho/GoFlowDesk/internal/service/security"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	ctx := context.Background()
 
 	// Conexão com o banco
