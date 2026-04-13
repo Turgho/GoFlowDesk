@@ -1,22 +1,37 @@
 package main
 
 import (
-	"github.com/Turgho/GoFlowDesk/internal/database"
-	"github.com/Turgho/GoFlowDesk/internal/router"
+	"os"
+
+	"github.com/Turgho/GoFlowDesk/internal/app"
+	"github.com/Turgho/GoFlowDesk/internal/infrastructure/logging"
+	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
-// @title GoFlowDesk API
-// @version 1.0
-// @description This is the API documentation for GoFlowDesk, a workflow management system built with Go and PostgreSQL.
-// @contact.name API Support
-// @contact.url http://www.goflowdesk.com/support
-// @contact.email
 func main() {
-	// Set up the database connection
-	dbConnection := database.SetupDatabase()
-	defer dbConnection.Close()
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 
-	// Set up the router and start the server
-	router := router.SetupRouter(dbConnection)
-	router.Run(":8080")
+	debug := os.Getenv("ENVIRONMENT") != "production"
+
+	// Cria logger primeiro
+	appLogger, err := logging.NewLogger(debug)
+	if err != nil {
+		panic(err)
+	}
+	defer appLogger.Sync()
+
+	appLogger.Info("Iniciando aplicação...")
+
+	// Cria app passando o logger
+	app := app.NewApp(appLogger)
+
+	// Roda servidor
+	if err := app.Run(); err != nil {
+		appLogger.Error("Erro ao iniciar app", zap.Error(err))
+		os.Exit(1)
+	}
 }

@@ -1,19 +1,16 @@
-FROM golang:1.25.7-alpine AS build
+# Dockerfile left for reference only.  The application binary is built
+# and run locally during development; only the database is containerized
+# via docker-compose.
+#
+# To build an API image manually you can run:
+#
+#   docker build -t goflowdesk-api .
+#
+# but `docker-compose` no longer uses this file.
 
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
+FROM alpine:3.23 AS base
 
-COPY . .
-# Build the Go application with CGO disabled for a statically linked binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o goflowdesk ./cmd/api
+LABEL maintainer="GoFlowDesk Team"
 
-FROM alpine:3.23.3
-WORKDIR /app
-COPY --from=build /app/goflowdesk .
-COPY .env .
-
-RUN apk add --no-cache curl
-
-EXPOSE 8080
-CMD ["./goflowdesk"]
+# no binaries provided by default; this image is a placeholder.
+ENTRYPOINT []
